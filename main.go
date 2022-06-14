@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gocolly/colly"
 	"github.com/gorilla/mux"
@@ -17,6 +18,7 @@ type Part struct {
 	Price    string `json:"price,optional"`
 	Shipping string `json:"shipping,optional"`
 	Img      string `json:"img,optional"`
+	Grade    string `json:"grade,optional"`
 }
 
 var parts []Part
@@ -27,14 +29,21 @@ func getParts(url_suffix string) []Part {
 		colly.MaxDepth(100),
 	)
 
-	c.OnHTML("div[class=partPriceShippingHolder]", func(h *colly.HTMLElement) {
-		//fmt.Println(h.ChildText("div[class=partPrice]"))
+	c.OnHTML("div[class=individualPartHolder]", func(h *colly.HTMLElement) {
+		//fmt.Println(h.ChildAttrs("div", "class"))
+		//fmt.Println(h.ChildAttr("div[class=partShipping]", "class"))
 		//fmt.Println(h.ChildText("div[class=partShipping]"))
+		name := strings.Split(h.Response.Request.URL.String(), "/")
 		price := h.ChildText("div[class=partPrice]")
 		shipping := h.ChildText("div[class=partShipping]")
+		img := h.ChildText("div[class=partImageHolder]")
+		grade := h.ChildText("div[class=gradeText]")
 		h.ForEach("div", func(i int, h *colly.HTMLElement) {
 			p := Part{
-				Name:     h.Response.Request.URL.String(),
+				Name:     name[len(name)-1],
+				URL:      h.Response.Request.URL.String(),
+				Grade:    grade,
+				Img:      img,
 				Price:    price,
 				Shipping: shipping,
 			}
