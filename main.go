@@ -36,20 +36,17 @@ func getParts(url_suffix string) []Part {
 		name := strings.Split(h.Response.Request.URL.String(), "/")
 		price := h.ChildText("div[class=partPrice]")
 		shipping := h.ChildText("div[class=partShipping]")
-		img := h.ChildText("div[class=partImageHolder]")
+		img := h.ChildAttr("img", "src")
 		grade := h.ChildText("div[class=gradeText]")
-		h.ForEach("div", func(i int, h *colly.HTMLElement) {
-			p := Part{
-				Name:     name[len(name)-1],
-				URL:      h.Response.Request.URL.String(),
-				Grade:    grade,
-				Img:      img,
-				Price:    price,
-				Shipping: shipping,
-			}
-			parts = append(parts, p)
-			//c.Visit(h.Request.AbsoluteURL(h.ChildAttr("a", "href")))
-		})
+		p := Part{
+			Name:     name[len(name)-1],
+			URL:      h.Response.Request.URL.String(),
+			Grade:    grade,
+			Img:      img,
+			Price:    price,
+			Shipping: shipping,
+		}
+		parts = append(parts, p)
 
 	})
 	c.OnRequest(func(r *colly.Request) {
