@@ -30,14 +30,13 @@ func getParts(url_suffix string) []Part {
 	)
 
 	c.OnHTML("div[class=individualPartHolder]", func(h *colly.HTMLElement) {
-		//fmt.Println(h.ChildAttrs("div", "class"))
-		//fmt.Println(h.ChildAttr("div[class=partShipping]", "class"))
-		//fmt.Println(h.ChildText("div[class=partShipping]"))
+
 		name := strings.Split(h.Response.Request.URL.String(), "/")
 		price := h.ChildText("div[class=partPrice]")
 		shipping := h.ChildText("div[class=partShipping]")
 		img := h.ChildAttr("img", "src")
 		grade := h.ChildText("div[class=gradeText]")
+
 		p := Part{
 			Name:     name[len(name)-1],
 			URL:      h.Response.Request.URL.String(),
@@ -46,13 +45,13 @@ func getParts(url_suffix string) []Part {
 			Price:    price,
 			Shipping: shipping,
 		}
+
 		parts = append(parts, p)
 
 	})
 	c.OnRequest(func(r *colly.Request) {
 		log.Println("visiting", r.URL.String())
 	})
-	// https://www.hollanderparts.com/
 
 	c.Visit("https://www.hollanderparts.com/" + url_suffix)
 
@@ -72,7 +71,6 @@ func getEngines(url_suffix string) []Part {
 	)
 
 	c.OnHTML("div[class=searchColOne]", func(h *colly.HTMLElement) {
-		//fmt.Println(h)
 		h.ForEach("div", func(i int, h *colly.HTMLElement) {
 			p := Part{
 				Name: h.ChildText("a"),
@@ -82,17 +80,10 @@ func getEngines(url_suffix string) []Part {
 			c.Visit(h.Request.AbsoluteURL(h.ChildAttr("a", "href")))
 		})
 
-		//link := h.ChildAttr("a", "href")
-		//if strings.Index(link, "engine") != -1 {
-		//fmt.Println("Fetching Engine Parts...")
-		////c.Visit(h.Request.AbsoluteURL(link))
-
-		//}
 	})
 	c.OnRequest(func(r *colly.Request) {
 		log.Println("visiting", r.URL.String())
 	})
-	// https://www.hollanderparts.com/
 	c.Visit("https://www.hollanderparts.com/" + url_suffix)
 	c.Wait()
 
