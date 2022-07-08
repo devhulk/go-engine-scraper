@@ -26,7 +26,6 @@ var parts []Part
 func getParts(url_suffix string) []Part {
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),
-		colly.MaxDepth(100),
 	)
 
 	c.OnHTML("div[class=individualPartHolder]", func(h *colly.HTMLElement) {
@@ -67,7 +66,6 @@ func getEngines(url_suffix string) []Part {
 	var engines []Part
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),
-		colly.MaxDepth(100),
 	)
 
 	c.OnHTML("div[class=searchColOne]", func(h *colly.HTMLElement) {
@@ -96,7 +94,6 @@ func getEngineLinks(w http.ResponseWriter, r *http.Request) {
 	// Data Structure is Category -> Part Type -> Part -> Part Fitment -> Mathing Parts
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),
-		colly.MaxDepth(100),
 	)
 
 	// Before making a request print "Visiting ..."
@@ -153,6 +150,8 @@ func getEngineLinks(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	w.Write(j)
+
+	parts = []Part{}
 }
 
 func main() {
